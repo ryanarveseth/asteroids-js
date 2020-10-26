@@ -41,7 +41,8 @@ const Canvas = ({gameState, setShipPosition, boost}) => {
             a.onload = () => { 
                 c.save();
                 c.translate(asteroid.x , asteroid.y);
-                c.drawImage(a, -16, -45);
+                c.rotate(asteroid.angle * Math.PI / 180);
+                c.drawImage(a, -asteroid.radius, -asteroid.radius);
                 c.restore();
             }
         })

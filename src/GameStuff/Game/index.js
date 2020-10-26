@@ -51,45 +51,96 @@ export class Bullet {
 };
 
 class Asteroid {
-    constructor (x, y, speed, angle) {
+    constructor (x, y, velX, velY, angle) {
         this.x = x; 
         this.y = y;
-        this.speed = speed;
+        this.velX = velX;
+        this.velY = velY;
         this.angle = angle;
+        this.dir = Math.floor(Math.random() * (2)) + 1 === 2 ? -1 : 1;
     }
 };
 
 class LargeAsteroid extends Asteroid {
-    constructor(x, y, speed, angle) {
-        super(x,y,speed,angle);
+    constructor(x, y) {
+        const angle = Math.floor(Math.random() * (360)) + 1;
+        const velX = (Math.floor(Math.random() * (2)) + 1) + 1 * (-Math.sin(Math.PI / 180 * angle));
+        const velY = (Math.floor(Math.random() * (2)) + 1) + 1 * (Math.cos(Math.PI / 180 * angle));
+        super(x, y, velX, velY, angle);
         this.src = LgAsteroid;
         this.radius = 32;
-        this.rotation = Math.floor(Math.random() * (2 - 1) ) + 1;
+        this.rotation = 1;
     }
 };
 
 class MediumAsteroid extends Asteroid {
-    constructor(x, y, speed, angle) {
-        super(x, y, speed * 1.15, angle);
+    constructor(x, y) {
+        const angle = Math.floor(Math.random() * (360)) + 1;
+        const velX = (Math.floor(Math.random() * (2)) + 1) + 2 * (-Math.sin(Math.PI / 180 * angle));
+        const velY = (Math.floor(Math.random() * (2)) + 1) + 2 * (Math.cos(Math.PI / 180 * angle));
+        super(x, y, velX, velY, angle);
         this.src = MdAsteroid;
         this.radius = 24;
-        this.rotation = Math.floor(Math.random() * (3 - 1) ) + 1;
+        this.rotation = 1;
     }
 };
 
 class SmallAsteroid extends Asteroid {
-    constructor(x, y, speed, angle) {
-        super(x, y, speed * 1.25, angle);
+    constructor(x, y) {
+        const angle = Math.floor(Math.random() * (360)) + 1;
+        const velX = (Math.floor(Math.random() * (3)) + 1) + 3 * (-Math.sin(Math.PI / 180 * angle));
+        const velY = (Math.floor(Math.random() * (3)) + 1) + 3 * (Math.cos(Math.PI / 180 * angle));
+        super(x, y, velX, velY, angle);
         this.src = SmAsteroid;
-        this.rotation = Math.floor(Math.random() * (7 - 1) ) + 1;
+        this.rotation = 1;
         this.radius = 16;
     }
 };
 
 
-const initAsteroids = level => {
+const initAsteroids = (level = 1) => {
+    let numAsteroids = 0;
+    let asteroids = [];
+    switch (level) {
+        case 1: 
+            numAsteroids = 10;
+            break;
+        case 2:
+            numAsteroids = 6;
+            break;
+        case 3: 
+            numAsteroids = 7;
+            break;
+        case 4:
+            numAsteroids = 8;
+            break;
+        default:
+            numAsteroids = 10;
+    }
 
-    return [];
+    for (let num = numAsteroids; num > 0; num--) {
+        let asteroidType = Math.floor(Math.random() * (10)) + 1;
+        let x = Math.floor(Math.random() * (window.innerWidth)) + 1;
+        let y = Math.floor(Math.random() * (window.innerHeight)) + 1;
+
+
+        while (x > window.innerWidth / 2 - 100 && 
+            x < window.innerWidth / 2 + 100 && 
+            y > window.innerHeight / 2 - 100 && 
+            y < window.innerHeight / 2 + 100) {
+                x = Math.floor(Math.random() * (window.innerWidth)) + 1;
+                y = Math.floor(Math.random() * (window.innerHeight)) + 1;
+            }
+
+        if (asteroidType > 3) {
+            asteroids.push(new LargeAsteroid(x, y));
+        } else if (asteroidType > 1) {
+            asteroids.push(new MediumAsteroid(x, y));
+        } else {
+            asteroids.push(new SmallAsteroid(x, y));
+        }
+    }
+    return asteroids;
 };
 
 
@@ -132,7 +183,6 @@ const Game = () => {
             const newSpeed = kp.u ? -velocityChange : 0;
             
             const bA = (prevState.ship.angle + newAngle);
-            let bS = prevState.ship.speed + newSpeed;
 
             const velX = prevState.ship.vel.x - newSpeed * (-Math.sin(Math.PI / 180 * bA));
             const velY = prevState.ship.vel.y - newSpeed * (Math.cos(Math.PI / 180 * bA));
@@ -161,23 +211,18 @@ const Game = () => {
                 return bullet;
             }).filter(bullet => !bullet.isDead());
 
-            asteroids = asteroids.map((asteroid, i) => {
-                asteroid.decreaseLife();
-                if (asteroid.life > largestBulletLife) {
-                    largestBulletLife = asteroid.life;
-                }
-
-                asteroid.x = getNextPositionX(asteroid.x + asteroid.speed * (-Math.sin(Math.PI / 180 * asteroid.angle)));
-                asteroid.y = getNextPositionY(asteroid.y + asteroid.speed * (Math.cos(Math.PI / 180 * asteroid.angle)));
-
+            asteroids = asteroids.map((asteroid) => {
+                const newAngle = asteroid.angle + asteroid.rotation;
+                asteroid.angle = newAngle;
+                asteroid.x = getNextPositionX(asteroid.x - asteroid.velX);
+                asteroid.y = getNextPositionY(asteroid.y - asteroid.velY);
+                
                 return asteroid;
-            }).filter(asteroid => !asteroid.isDead());
+            });
 
 
 
             if (kp.s && largestBulletLife < 110) {
-                console.log('newSpeed', newSpeed);
-    
                 const bVelX = prevState.ship.vel.x + 5 * (-Math.sin(Math.PI / 180 * bA));
                 const bVelY = prevState.ship.vel.y + 5 * (Math.cos(Math.PI / 180 * bA));
 
@@ -202,7 +247,8 @@ const Game = () => {
                     },
                     angle: prevState.ship.angle + newAngle,
                 }, 
-                bullets: [...bullets]
+                bullets: [...bullets],
+                asteroids: [...asteroids]
             });
         });
     };
