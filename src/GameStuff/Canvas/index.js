@@ -1,8 +1,9 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import rocket from "../images/Rocket/rocket-ship.png";
 import rocketWithBoost from "../images/Rocket/rocket-ship-with-boost.png";
+import explosion from "../images/Rocket/explosion.png";
 
-const Canvas = ({gameState, setShipPosition, boost}) => {
+const Canvas = ({gameState, setShipPosition, boost, exploded}) => {
 
     const [viewBox, setViewBox] = useState({width: window.innerWidth, height: window.innerHeight});
     const canvas = useRef();
@@ -40,14 +41,14 @@ const Canvas = ({gameState, setShipPosition, boost}) => {
             a.src = asteroid.src;
             a.onload = () => { 
                 c.save();
-                c.translate(asteroid.x , asteroid.y);
+                c.translate(asteroid.x, asteroid.y);
                 c.rotate(asteroid.angle * Math.PI / 180);
                 c.drawImage(a, -asteroid.radius, -asteroid.radius);
                 c.restore();
             }
         })
 
-       
+    if (!exploded) {
         ship.onload = () => { 
             c.clearRect(0, 0, con.width, con.height); 
             c.save();
@@ -56,6 +57,13 @@ const Canvas = ({gameState, setShipPosition, boost}) => {
             c.drawImage(ship, -32, -32);
             c.restore();
         }
+    } else {
+        let explode = new Image();
+        explode.src = explosion;
+        explode.onload = () => { 
+            c.drawImage(explode, gameState.ship.pos.x - 64, gameState.ship.pos.y - 64);
+        }
+    }
         // eslint-disable-next-line
     }, [boost, gameState.shipPosition, gameState.asteroids, gameState.bullets]);
     
