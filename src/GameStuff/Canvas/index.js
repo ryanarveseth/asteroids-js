@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import rocket from "../images/Rocket/rocket-ship.png";
-import rocketWithBoost from "../images/Rocket/rocket-ship-with-boost.png";
-import explosion from "../images/Rocket/explosion.png";
+import rocket from "../Game/images/Rocket/rocket-ship.png";
+import rocketWithBoost from "../Game/images/Rocket/rocket-ship-with-boost.png";
+import explosion from "../Game/images/Rocket/explosion.png";
 
 const Canvas = ({gameState, setShipPosition, boost, exploded}) => {
 
@@ -16,6 +16,7 @@ const Canvas = ({gameState, setShipPosition, boost, exploded}) => {
         setShipPosition(window.innerWidth / 2, window.innerHeight / 2);
 
         window.onresize = handleResize;
+        // eslint-disable-next-line
     }, []);
 
     useLayoutEffect(() => {

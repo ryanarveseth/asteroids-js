@@ -1,7 +1,5 @@
 import React from 'react';
-import { Image } from 'react-bootstrap';
 import styled from 'styled-components';
-import keyboard from '../../images/keyboard.png';
 
 const StartContainer = styled.div`
     width: 300px;

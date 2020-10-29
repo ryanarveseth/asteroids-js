@@ -23,7 +23,7 @@ const initialState = {
     largeAsteroidsKilled: 0,
     mediumAsteroidsKilled: 0,
     smallAsteroidsKilled: 0,
-    level: 1,
+    level: 0,
     asteroids: [],
     bullets: [],
     ship: {
@@ -43,30 +43,13 @@ const initialState = {
 
 
 const initAsteroids = (level = 1) => {
-    let numAsteroids = 0;
+    let numAsteroids = level + 4;
     let asteroids = [];
     let maxAsteroidStartingCount;
 
     const screenSizeArea = window.innerWidth * window.innerHeight;
     if (screenSizeArea < 400000) {
         maxAsteroidStartingCount = 5;
-    }
-
-    switch (level) {
-        case 1: 
-            numAsteroids = 5;
-            break;
-        case 2:
-            numAsteroids = 6;
-            break;
-        case 3: 
-            numAsteroids = 7;
-            break;
-        case 4:
-            numAsteroids = 8;
-            break;
-        default:
-            numAsteroids = 10;
     }
 
     if (maxAsteroidStartingCount === 5) {
@@ -93,10 +76,10 @@ const initAsteroids = (level = 1) => {
         let y = Math.floor(Math.random() * (window.innerHeight)) + 1;
         let triesForNewPoints = 0;
 
-        while (x > window.innerWidth / 2 - 100 && 
-            x < window.innerWidth / 2 + 100 && 
-            y > window.innerHeight / 2 - 100 && 
-            y < window.innerHeight / 2 + 100 && 
+        while (x > window.innerWidth / 2 - 200 && 
+            x < window.innerWidth / 2 + 200 && 
+            y > window.innerHeight / 2 - 200 && 
+            y < window.innerHeight / 2 + 200 && 
             doesntClashWithOtherExistingAsteroids(x, y, pointMap)) {
                 x = Math.floor(Math.random() * (window.innerWidth)) + 1;
                 y = Math.floor(Math.random() * (window.innerHeight)) + 1;
@@ -156,16 +139,15 @@ const Game = () => {
         return newY;
     };
 
-    const updateGameLoop = () => {
-        console.log('can I start yet');
-        
-        const shipRotation = 4;
-        const velocityChange = .05;
+    const updateGameLoop = () => {      
         setBoost(kp.u);
 
         if (!showStartModal) {
             setGameState(prevState => {
                 if (!prevState.gameOver) {
+                    const shipRotation = 5;
+                    const velocityChange = .05 * prevState.level;
+
                     const newAngle = (kp.l && !kp.r) ? -shipRotation : (kp.r && !kp.l) ? shipRotation : 0;
                     const newSpeed = kp.u ? -velocityChange : 0;
                     
@@ -185,9 +167,11 @@ const Game = () => {
                     let mediumAsteroidsKilled = prevState.mediumAsteroidsKilled;
                     let smallAsteroidsKilled = prevState.smallAsteroidsKilled;
                     let gameOver = false;
+                    let level = prevState.level;
 
-                    if (!asteroids.length) {
-                        asteroids = initAsteroids();
+                    if (!asteroids.length) {    
+                        level++;
+                        asteroids = initAsteroids(level);
                     }
 
                     let largestBulletLife = 0;
@@ -286,7 +270,8 @@ const Game = () => {
                         largeAsteroidsKilled: largeAsteroidsKilled,
                         mediumAsteroidsKilled: mediumAsteroidsKilled,
                         smallAsteroidsKilled: smallAsteroidsKilled,
-                        gameOver: gameOver
+                        gameOver: gameOver,
+                        level: level
                     });
                 } else {
                     return ({...prevState});

@@ -1,7 +1,7 @@
-import Blaster from '../images/Rocket/blaster.png';
-import LgAsteroid from '../images/Asteroids/large-asteroid.png';
-import MdAsteroid from '../images/Asteroids/medium-asteroid.png';
-import SmAsteroid from '../images/Asteroids/small-asteroid.png';
+import Blaster from './images/Rocket/blaster.png';
+import LgAsteroid from './images/Asteroids/large-asteroid.png';
+import MdAsteroid from './images/Asteroids/medium-asteroid.png';
+import SmAsteroid from './images/Asteroids/small-asteroid.png';
 
 export class Bullet {
     constructor (velX, velY, x, y, angle) {

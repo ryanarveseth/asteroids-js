@@ -19,10 +19,6 @@ const GameoverContainer = styled.div`
     letter-spacing: 2px;
 `;
 
-const Mid = styled.div`
-    
-`;
-
 const StartOver = styled.button`
     transition: .5s;
     width: 100%;
